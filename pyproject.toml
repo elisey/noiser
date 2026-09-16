@@ -1,0 +1,23 @@
+[project]
+name = "noiser"
+version = "0.1.0"
+description = "macOS menu bar noise generator with a pull-to-set timer"
+requires-python = ">=3.13"
+# Keep in sync with the PEP 723 header in noiser.py, which serves `uv run` on the bare script.
+dependencies = [
+    "numpy",
+    "scipy",
+    "sounddevice",
+    "pyobjc-framework-Cocoa",
+    "pyobjc-framework-CoreAudio",
+]
+
+[project.scripts]
+noiser = "noiser:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["noiser.py"]
