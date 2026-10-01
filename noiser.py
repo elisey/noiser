@@ -114,7 +114,7 @@ def _build_filters():
 
 # Second-order sections applied to white noise; None means raw white.
 NOISE_FILTERS = _build_filters()
-NOISE_LABELS = (("white", "Белый"), ("pink", "Розовый"), ("brown", "Коричневый"))
+NOISE_LABELS = (("white", "White"), ("pink", "Pink"), ("brown", "Brown"))
 
 # Drag distance -> duration. Centimeters are nominal (macOS assumes 72 pt per inch),
 # so tune MINUTES_PER_CM against a ruler on your own screen.
@@ -500,14 +500,14 @@ class BallView(NSView):
         if self.dragging:
             minutes = drag_minutes(self.drag_distance())
             if minutes < MIN_DURATION_MINUTES:
-                return "∞", "отпусти — без таймера"
-            return fmt_minutes(minutes), "отпусти — старт"
+                return "∞", "release — no timer"
+            return fmt_minutes(minutes), "release — start"
         state = self.engine.state
         if state == IDLE:
-            return "", "тяни или кликни"
+            return "", "drag or click"
         remaining = self.engine.remaining()
         main = fmt_hms(remaining) if remaining is not None else "∞"
-        return main, "пауза" if state == PAUSED else "шумим"
+        return main, "paused" if state == PAUSED else "playing"
 
     def drawRect_(self, _rect):
         size = self.bounds().size
@@ -782,29 +782,29 @@ class AppDelegate(NSObject):
         self.noise_popup.selectItemAtIndex_([k for k, _ in NOISE_LABELS].index(self.settings.noise))
         self.noise_popup.setTarget_(self)
         self.noise_popup.setAction_("noiseChanged:")
-        row("Шум", 188, self.noise_popup, 26)
+        row("Noise", 188, self.noise_popup, 26)
 
         self.volume_slider = NSSlider.sliderWithValue_minValue_maxValue_target_action_(
             self.settings.volume_db, VOLUME_MIN_DB, VOLUME_MAX_DB, self, "volumeChanged:"
         )
         self.volume_slider.setContinuous_(True)
         self.volume_slider.setFrame_(NSMakeRect(0, 0, control_w, 24))
-        row("Громкость", 148, self.volume_slider, 24)
+        row("Volume", 148, self.volume_slider, 24)
 
         self.color_well = AnchoredColorWell.alloc().initWithFrame_(NSMakeRect(0, 0, 56, 26))
         self.color_well.setColor_(color_from_hex(self.settings.ball_color))
         self.color_well.setTarget_(self)
         self.color_well.setAction_("colorChanged:")
-        row("Шарик", 108, self.color_well, 26)
+        row("Ball", 108, self.color_well, 26)
 
         self.announce_checkbox = NSButton.checkboxWithTitle_target_action_(
-            "Объявлять «time is up»", self, "announceChanged:"
+            "Announce “time is up”", self, "announceChanged:"
         )
         self.announce_checkbox.setFrame_(NSMakeRect(control_x - 2, 66 - 11, control_w, 22))
         self.announce_checkbox.setState_(NSControlStateValueOn if self.settings.announce else 0)
         content.addSubview_(self.announce_checkbox)
 
-        close_button = NSButton.buttonWithTitle_target_action_("Закрыть", self, "closeSettings:")
+        close_button = NSButton.buttonWithTitle_target_action_("Close", self, "closeSettings:")
         close_button.setFrame_(NSMakeRect(w - margin - 96, 14, 96, 30))
         # Escape triggers the button, so the window also closes from the keyboard.
         close_button.setKeyEquivalent_("\x1b")
