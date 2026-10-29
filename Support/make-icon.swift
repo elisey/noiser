@@ -75,6 +75,23 @@ func noiseWave(in rect: CGRect, points: Int, seed: UInt64, roughness: CGFloat) -
 // MARK: - Variants
 
 let variants: [(name: String, draw: () -> Void)] = [
+    ("tomato", {
+        // The brand mark, flat: cream ball on a coal thread over a tomato tile (noiser-app-icon.svg).
+        let tile = NSBezierPath(roundedRect: shapeRect, xRadius: 190, yRadius: 190)
+        rgb(0xFF, 0x4F, 0x2B).setFill()
+        tile.fill()
+        // The SVG places the mark with translate(338 251) scale(4.35) from the top-left corner;
+        // AppKit's y axis points up, so top-left coordinates are flipped against the canvas.
+        let scale: CGFloat = 4.35
+        func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: 338 + x * scale, y: canvas - (251 + y * scale)) }
+        let threadTop = point(29, 0), threadBottom = point(51, 52)
+        let thread = CGRect(x: threadTop.x, y: threadBottom.y, width: threadBottom.x - threadTop.x, height: threadTop.y - threadBottom.y)
+        rgb(0x12, 0x12, 0x12).setFill()
+        NSBezierPath(roundedRect: thread, xRadius: 11 * scale, yRadius: 11 * scale).fill()
+        let center = point(40, 80), r = 40 * scale
+        rgb(0xF1, 0xEA, 0xDF).setFill()
+        NSBezierPath(ovalIn: CGRect(x: center.x - r, y: center.y - r, width: 2 * r, height: 2 * r)).fill()
+    }),
     ("ball", {
         // The signature gesture: a ball pulled on its string.
         let p = Palette(top: rgb(46, 54, 84), bottom: rgb(22, 26, 44), ball: rgb(255, 122, 89), line: rgb(190, 198, 220))

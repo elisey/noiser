@@ -41,5 +41,5 @@ clean:
 # Regenerates Support/noiser.icns from the drawing code; only needed after editing make-icon.swift.
 icon:
 	rm -rf .build/noiser.iconset
-	swift Support/make-icon.swift icns ball .build/noiser.iconset
+	swift Support/make-icon.swift icns tomato .build/noiser.iconset
 	iconutil -c icns .build/noiser.iconset -o Support/noiser.icns
