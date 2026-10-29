@@ -2,8 +2,9 @@ import AppKit
 
 let ballRadius: CGFloat = Theme.Metrics.ballDiameter / 2
 
-/// nil or a malformed value means the default ball color.
+/// nil or a malformed value means the default ball color; the ink preset follows the appearance.
 func color(fromHex value: String?) -> NSColor {
+    if value == BallPreset.inkHex { return Theme.ink }
     guard let value, value.count == 7, value.hasPrefix("#"), let rgb = UInt32(value.dropFirst(), radix: 16) else {
         return Theme.ball
     }
