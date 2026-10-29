@@ -4,11 +4,6 @@ import AVFoundation
 final class AppDelegate: NSObject, NSApplicationDelegate {
     static let popoverWidth = Theme.Metrics.popoverWidth
     static let popoverHeight = Theme.Metrics.popoverHeight
-    static let icons: [PlayState: String] = [
-        .idle: "waveform",
-        .playing: "waveform.circle.fill",
-        .paused: "pause.circle",
-    ]
 
     private var settings: Settings!
     private var engine: NoiseEngine!
@@ -18,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var settingsWindow: SettingsWindow?
     private var tickTimer: Timer?
     private var iconState: PlayState?
+    private var iconTitle: String?
     private let speech = AVSpeechSynthesizer()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -27,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
+            button.imagePosition = .imageOnly
             button.target = self
             button.action = #selector(togglePopover(_:))
         }
@@ -108,14 +105,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func refresh() {
-        setIcon(engine.state)
+        setIcon(engine.state, title: MenuBarIcon.minutesLabel(remaining: engine.remaining()))
         ballView.needsDisplay = true
     }
 
-    private func setIcon(_ state: PlayState) {
-        guard iconState != state else { return }
-        iconState = state
-        statusItem.button?.image = symbolImage(Self.icons[state]!)
+    private func setIcon(_ state: PlayState, title: String?) {
+        guard let button = statusItem.button else { return }
+        if iconState != state {
+            iconState = state
+            button.image = MenuBarIcon.image(for: state)
+        }
+        if iconTitle != title {
+            iconTitle = title
+            button.attributedTitle = MenuBarIcon.title(title ?? "")
+            button.imagePosition = title == nil ? .imageOnly : .imageLeading
+        }
     }
 
     @objc private func openSettings(_ sender: Any?) {

@@ -114,9 +114,3 @@ func drawPill(_ text: String, look: PillLook, top: CGFloat, in rect: NSRect) {
     }
     drawCentered(label, top: top, lineHeight: height, in: frame)
 }
-
-func symbolImage(_ name: String) -> NSImage? {
-    let image = NSImage(systemSymbolName: name, accessibilityDescription: nil)
-    image?.isTemplate = true
-    return image
-}
