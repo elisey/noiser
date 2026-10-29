@@ -42,19 +42,27 @@ enum Theme {
     // MARK: Metrics
 
     enum Metrics {
-        static let popoverWidth: CGFloat = 232
-        static let popoverHeight: CGFloat = 220
-        static let ballDiameter: CGFloat = 64
-        static let threadWidth: CGFloat = 18
+        /// The popover and everything in it (ball, thread, type, buttons) is drawn at this
+        /// fraction of the design-system sizes; the settings window and menu bar are not.
+        static let popoverScale: CGFloat = 0.85
+
+        /// A popover size from the design system, scaled.
+        static func popover(_ value: CGFloat) -> CGFloat { value * popoverScale }
+
+        static let popoverWidth = popover(232)
+        static let popoverHeight = popover(220)
+        static let ballDiameter = popover(64)
+        static let threadWidth = popover(18)
         /// From the top of the content to the top of the ball, plus the overlap into the ball.
-        static let threadLength: CGFloat = 48
-        static let ballTop: CGFloat = 38
-        static let timeTop: CGFloat = 116
-        static let pillTop: CGFloat = 176
-        static let pillHeight: CGFloat = 24
-        static let iconButton: CGFloat = 24
-        static let iconInset: CGFloat = 12
-        static let popoverRadius: CGFloat = 22
+        static let threadLength = popover(48)
+        static let ballTop = popover(38)
+        static let timeTop = popover(116)
+        static let timeLineHeight = popover(46)
+        static let pillTop = popover(176)
+        static let pillHeight = popover(24)
+        static let iconButton = popover(24)
+        static let iconInset = popover(12)
+        static let popoverRadius = popover(22)
         static let settingsWidth: CGFloat = 360
     }
 
@@ -159,9 +167,9 @@ enum Theme {
         }
     }
 
-    static let time = TextStyle(size: 46, weight: 900, tracking: -0.05, tabular: true)
-    static let timeLong = TextStyle(size: 36, weight: 900, tracking: -0.05, tabular: true)
-    static let pill = TextStyle(size: 11, weight: 900, tracking: 0.04, uppercase: true)
+    static let time = TextStyle(size: Metrics.popover(46), weight: 900, tracking: -0.05, tabular: true)
+    static let timeLong = TextStyle(size: Metrics.popover(36), weight: 900, tracking: -0.05, tabular: true)
+    static let pill = TextStyle(size: Metrics.popover(11), weight: 900, tracking: 0.04, uppercase: true)
     static let label = TextStyle(size: 13, weight: 700)
     static let caption = TextStyle(size: 12, weight: 600, tracking: 0.04, uppercase: true)
     static let menubar = TextStyle(size: 13, weight: 800, tabular: true)

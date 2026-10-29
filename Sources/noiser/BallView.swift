@@ -130,7 +130,7 @@ final class BallView: NSView {
 
         let style = display.longTime ? Theme.timeLong : Theme.time
         let timeColor = display.timeTone == .faint ? Theme.inkFaint : Theme.ink
-        drawCentered(style.string(display.time, color: timeColor), top: Theme.Metrics.timeTop, lineHeight: 46, in: bounds)
+        drawCentered(style.string(display.time, color: timeColor), top: Theme.Metrics.timeTop, lineHeight: Theme.Metrics.timeLineHeight, in: bounds)
         drawPill(display.pill, look: display.pillLook, top: Theme.Metrics.pillTop, in: bounds)
     }
 

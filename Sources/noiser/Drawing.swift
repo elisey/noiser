@@ -61,7 +61,7 @@ func drawBall(center: NSPoint, color: NSColor, look: BallLook, scale: CGFloat = 
         color.setFill()
         NSBezierPath(ovalIn: rect).fill()
     case .ring:
-        let ringWidth: CGFloat = 9
+        let ringWidth = Theme.Metrics.popover(9)
         let ring = NSBezierPath(ovalIn: rect.insetBy(dx: ringWidth / 2, dy: ringWidth / 2))
         ring.lineWidth = ringWidth
         Theme.paper.setFill()
@@ -73,11 +73,11 @@ func drawBall(center: NSPoint, color: NSColor, look: BallLook, scale: CGFloat = 
 
 /// Where the ball rests while it is being dragged: a dashed outline.
 func drawBallGhost(center: NSPoint) {
-    let lineWidth: CGFloat = 3
+    let lineWidth = Theme.Metrics.popover(3)
     let rect = NSRect(x: center.x - ballRadius, y: center.y - ballRadius, width: 2 * ballRadius, height: 2 * ballRadius)
     let ghost = NSBezierPath(ovalIn: rect.insetBy(dx: lineWidth / 2, dy: lineWidth / 2))
     ghost.lineWidth = lineWidth
-    ghost.setLineDash([6, 5], count: 2, phase: 0)
+    ghost.setLineDash([Theme.Metrics.popover(6), Theme.Metrics.popover(5)], count: 2, phase: 0)
     Theme.ink.withAlphaComponent(0.35).setStroke()
     ghost.stroke()
 }
@@ -96,13 +96,13 @@ func drawPill(_ text: String, look: PillLook, top: CGFloat, in rect: NSRect) {
     }
     let label = Theme.pill.string(text, color: textColor)
     let height = Theme.Metrics.pillHeight
-    let padding: CGFloat = 12
+    let padding = Theme.Metrics.popover(12)
     let width = (label.size().width + 2 * padding).rounded()
     let frame = NSRect(x: (rect.midX - width / 2).rounded(), y: top, width: width, height: height)
 
     switch look {
     case .outline:
-        let lineWidth: CGFloat = 1.5
+        let lineWidth = Theme.Metrics.popover(1.5)
         let inset = frame.insetBy(dx: lineWidth / 2, dy: lineWidth / 2)
         let path = NSBezierPath(roundedRect: inset, xRadius: inset.height / 2, yRadius: inset.height / 2)
         path.lineWidth = lineWidth

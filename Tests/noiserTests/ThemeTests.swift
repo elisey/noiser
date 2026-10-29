@@ -87,11 +87,31 @@ private func axisValue(_ font: NSFont, _ tag: Int) -> Double? {
         #expect(abs(one - eight) < 0.01)
     }
 
+    @Test func popoverIsScaledAsAWhole() {
+        typealias M = Theme.Metrics
+        #expect(M.popoverScale == 0.85)
+        let scaled: [(CGFloat, CGFloat)] = [
+            (M.popoverWidth, 232), (M.popoverHeight, 220), (M.ballDiameter, 64), (M.threadWidth, 18),
+            (M.ballTop, 38), (M.timeTop, 116), (M.timeLineHeight, 46), (M.pillTop, 176), (M.pillHeight, 24),
+            (M.iconButton, 24), (M.iconInset, 12),
+            (Theme.time.size, 46), (Theme.timeLong.size, 36), (Theme.pill.size, 11),
+        ]
+        for (value, design) in scaled {
+            #expect(value == design * M.popoverScale)
+        }
+        // The thread keeps the mark's proportion to the ball.
+        #expect(abs(M.threadWidth / M.ballDiameter - 0.28) < 0.01)
+        // Outside the popover nothing is scaled.
+        #expect(M.settingsWidth == 360)
+        #expect(Theme.label.size == 13)
+        #expect(Theme.menubar.size == 13)
+    }
+
     @Test func textStyleAppliesTrackingAndCase() {
         let text = Theme.pill.string("playing", color: Theme.ink)
         #expect(text.string == "PLAYING")
         let kern = text.attribute(.kern, at: 0, effectiveRange: nil) as? CGFloat
-        #expect(kern == 11 * 0.04)
+        #expect(kern == Theme.pill.size * 0.04)
         #expect(text.attribute(.kern, at: text.length - 1, effectiveRange: nil) == nil)
         #expect(Theme.time.string("24:13", color: Theme.ink).string == "24:13")
     }
