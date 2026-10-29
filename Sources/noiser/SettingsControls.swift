@@ -53,7 +53,7 @@ final class SegmentedPill: NSControl {
     private var segmentElements: [SegmentElement] = []
 
     static let font = Theme.TextStyle(size: 12, weight: 800)
-    private let inset: CGFloat = 4
+    private let inset: CGFloat = 3
 
     init(titles: [String], selectedIndex: Int) {
         self.titles = titles

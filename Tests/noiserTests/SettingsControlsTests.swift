@@ -69,9 +69,10 @@ private func keyEvent(_ key: NSEvent.SpecialKey) -> NSEvent {
         let pill = SegmentedPill(titles: ["A", "B", "C"], selectedIndex: 0)
         pill.frame = NSRect(x: 0, y: 0, width: 220, height: 34)
         let widths = (0..<3).map { pill.segmentFrame($0).width }
-        #expect(widths.allSatisfy { abs($0 - 212.0 / 3) < 0.001 })
-        #expect(pill.segmentFrame(0).minX == 4)
-        #expect(abs(pill.segmentFrame(2).maxX - 216) < 0.001)
+        #expect(widths.allSatisfy { abs($0 - 214.0 / 3) < 0.001 })
+        #expect(pill.segmentFrame(0).minX == 3)
+        #expect(pill.segmentFrame(0).height == 28)
+        #expect(abs(pill.segmentFrame(2).maxX - 217) < 0.001)
     }
 
     @Test func sliderKnobTravelsTheWholeTrack() {

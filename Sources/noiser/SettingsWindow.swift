@@ -54,6 +54,8 @@ final class SettingsWindow: NSObject, NSWindowDelegate {
     static let labelWidth: CGFloat = 76
     static let gap: CGFloat = 16
     static let rowGap: CGFloat = 24
+    /// The content starts below at least this much title bar, whatever the system's own height.
+    static let minTitlebarHeight: CGFloat = 32
 
     let window: NSWindow
     private let settings: Settings
@@ -107,7 +109,7 @@ final class SettingsWindow: NSObject, NSWindowDelegate {
         content.addSubview(titleMark)
         content.addSubview(wordmark)
 
-        var y = titlebarHeight + Self.margin
+        var y = max(titlebarHeight, Self.minTitlebarHeight) + Self.margin
 
         func label(_ text: String, centerY: CGFloat) {
             let field = NSTextField(labelWithAttributedString: Theme.label.string(text, color: Theme.inkMuted))
