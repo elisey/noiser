@@ -146,7 +146,16 @@ enum Theme {
         }
 
         func string(_ text: String, color: NSColor) -> NSAttributedString {
-            NSAttributedString(string: uppercase ? text.uppercased() : text, attributes: attributes(color: color))
+            let result = NSMutableAttributedString(
+                string: uppercase ? text.uppercased() : text,
+                attributes: attributes(color: color)
+            )
+            // Tracking goes between letters; after the last one it would only shift the centering.
+            if let last = result.string.indices.last {
+                let range = NSRange(last..<result.string.endIndex, in: result.string)
+                result.removeAttribute(.kern, range: range)
+            }
+            return result
         }
     }
 

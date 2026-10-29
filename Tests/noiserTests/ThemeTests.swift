@@ -92,6 +92,7 @@ private func axisValue(_ font: NSFont, _ tag: Int) -> Double? {
         #expect(text.string == "PLAYING")
         let kern = text.attribute(.kern, at: 0, effectiveRange: nil) as? CGFloat
         #expect(kern == 11 * 0.04)
+        #expect(text.attribute(.kern, at: text.length - 1, effectiveRange: nil) == nil)
         #expect(Theme.time.string("24:13", color: Theme.ink).string == "24:13")
     }
 }

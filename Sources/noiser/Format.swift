@@ -23,9 +23,11 @@ enum Duration {
         return max(minMinutes, roundMinutes(raw))
     }
 
+    /// "24:13" under an hour, "1:05:00" with hours.
     static func hms(_ seconds: Double) -> String {
         let s = max(0, Int(seconds))
-        return String(format: "%02d:%02d:%02d", s / 3600, s % 3600 / 60, s % 60)
+        let (h, m, sec) = (s / 3600, s % 3600 / 60, s % 60)
+        return h > 0 ? String(format: "%d:%02d:%02d", h, m, sec) : String(format: "%02d:%02d", m, sec)
     }
 
     static func minutes(_ minutes: Int) -> String {

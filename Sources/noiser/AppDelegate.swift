@@ -2,8 +2,8 @@ import AppKit
 import AVFoundation
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    static let popoverWidth: CGFloat = 150
-    static let popoverHeight: CGFloat = 130
+    static let popoverWidth = Theme.Metrics.popoverWidth
+    static let popoverHeight = Theme.Metrics.popoverHeight
     static let icons: [PlayState: String] = [
         .idle: "waveform",
         .playing: "waveform.circle.fill",
@@ -44,21 +44,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func buildPopover() {
         let w = Self.popoverWidth, h = Self.popoverHeight
-        let container = NSView(frame: NSRect(x: 0, y: 0, width: w, height: h))
+        let container = PopoverContentView(frame: NSRect(x: 0, y: 0, width: w, height: h))
 
         ballView = BallView(frame: NSRect(x: 0, y: 0, width: w, height: h), engine: engine, settings: settings)
         ballView.onRelease = { [weak self] seconds in self?.startNoise(seconds: seconds) }
         ballView.onToggle = { [weak self] in self?.togglePause() }
         container.addSubview(ballView)
 
-        let gear = NSButton(image: symbolImage("gearshape")!, target: self, action: #selector(openSettings(_:)))
-        gear.isBordered = false
-        gear.frame = NSRect(x: w - 28, y: h - 28, width: 22, height: 22)
+        let side = Theme.Metrics.iconButton, inset = Theme.Metrics.iconInset
+        let gear = IconButton(glyph: .settings, label: "Settings", target: self, action: #selector(openSettings(_:)))
+        gear.frame.origin = NSPoint(x: w - inset - side, y: h - inset - side)
         container.addSubview(gear)
 
-        let quit = NSButton(image: symbolImage("xmark")!, target: self, action: #selector(quit(_:)))
-        quit.isBordered = false
-        quit.frame = NSRect(x: 6, y: h - 28, width: 22, height: 22)
+        let quit = IconButton(glyph: .close, label: "Quit noiser", target: self, action: #selector(quit(_:)))
+        quit.frame.origin = NSPoint(x: inset, y: h - inset - side)
         container.addSubview(quit)
 
         let controller = NSViewController()
@@ -99,8 +98,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func tick() {
-        if engine.takeFinished(), settings.announce {
-            speech.speak(AVSpeechUtterance(string: "time is up"))
+        if engine.takeFinished() {
+            ballView.showTimeIsUp()
+            if settings.announce {
+                speech.speak(AVSpeechUtterance(string: "time is up"))
+            }
         }
         refresh()
     }
