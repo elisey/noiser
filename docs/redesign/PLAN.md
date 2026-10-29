@@ -158,3 +158,7 @@
 ## Решения
 
 _(Claude Code: записывайте сюда, что пришлось сделать иначе и почему.)_
+
+- **Этап 1, регистрация шрифта.** `CTFontManagerRegisterFontsForURL(…, .process)` в `applicationDidFinishLaunching` (`Theme.registerFonts()`); `ATSApplicationFontsPath` не используется. Повторная регистрация (`alreadyRegistered`) не считается ошибкой. При запуске голого бинаря без бандла (`swift run`) шрифта нет — пишется строка в лог и используется системный шрифт.
+- **Этап 1, `caption`.** В плане 11pt, в `tokens.json` 12px; взято 12 из `tokens.json` как источника значений.
+- **Этап 1, проверка.** Добавлен тестовый таргет `noiserTests` (swift-testing, `make test`): цвета токенов в обеих темах, оси `wdth`/`wght`, табличные цифры, фолбэк.

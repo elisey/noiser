@@ -4,20 +4,24 @@ CONTENTS := $(APP)/Contents
 # Per-user; Spotlight and Login Items treat it like /Applications, and it needs no admin rights.
 PREFIX   ?= $(HOME)/Applications
 
-.PHONY: all build bundle run install uninstall clean icon
+.PHONY: all build test bundle run install uninstall clean icon
 
 all: bundle
 
 build:
 	swift build -c release
 
+test:
+	swift test
+
 # Command Line Tools have no app template, so the bundle is assembled by hand.
 bundle: build
 	rm -rf $(APP)
-	mkdir -p $(CONTENTS)/MacOS $(CONTENTS)/Resources
+	mkdir -p $(CONTENTS)/MacOS $(CONTENTS)/Resources $(CONTENTS)/Resources/Fonts
 	cp $(BIN) $(CONTENTS)/MacOS/noiser
 	cp Support/Info.plist $(CONTENTS)/Info.plist
 	cp Support/noiser.icns $(CONTENTS)/Resources/noiser.icns
+	cp Support/Fonts/Archivo.ttf Support/Fonts/OFL.txt $(CONTENTS)/Resources/Fonts/
 	printf 'APPL????' > $(CONTENTS)/PkgInfo
 	codesign --force --sign - $(APP)
 

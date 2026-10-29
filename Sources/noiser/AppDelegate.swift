@@ -21,6 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let speech = AVSpeechSynthesizer()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        Theme.registerFonts()
         settings = Settings()
         engine = NoiseEngine(settings: settings)
 
