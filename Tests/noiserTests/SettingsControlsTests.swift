@@ -37,6 +37,8 @@ private func keyEvent(_ key: NSEvent.SpecialKey) -> NSEvent {
     }
 
     @Test func segmentsSelectWithArrowKeys() {
+        // Actions are dispatched through NSApp.
+        _ = NSApplication.shared
         let sink = ActionSink()
         let pill = SegmentedPill(titles: ["White", "Pink", "Brown"], selectedIndex: 2)
         pill.frame = NSRect(x: 0, y: 0, width: 220, height: 34)
