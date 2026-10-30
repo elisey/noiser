@@ -1,13 +1,16 @@
 import Foundation
 
 // Drag distance -> duration. Centimeters are nominal (macOS assumes 72 pt per inch),
-// so tune `minutesPerCm` against a ruler on your own screen.
+// so tune the rates against a ruler on your own screen.
+// The scale is piecewise linear: each segment has its own rate.
 enum Duration {
-    static let minutesPerCm = 5.0
+    // (upper bound in minutes, minutes per cm); nil bound = everything above.
+    static let dragRates: [(limit: Double?, minutesPerCm: Double)] = [(60, 3.65), (120, 7.0), (600, 10.0), (nil, 60.0)]
     static let pointsPerCm = 72.0 / 2.54
     static let minMinutes = 1
     // (upper bound in minutes, rounding step); nil bound = everything above.
-    static let roundingSteps: [(limit: Double?, step: Double)] = [(30, 1), (60, 5), (nil, 10)]
+    // Whole hours past 10h, so long pulls show only hours.
+    static let roundingSteps: [(limit: Double?, step: Double)] = [(30, 1), (60, 5), (600, 10), (nil, 60)]
 
     static func roundMinutes(_ raw: Double) -> Int {
         for (limit, step) in roundingSteps where limit == nil || raw < limit! {
@@ -16,9 +19,22 @@ enum Duration {
         return Int(raw.rounded())
     }
 
+    static func rawMinutes(cm: Double) -> Double {
+        var minutes = 0.0
+        var cmLeft = cm
+        for (limit, rate) in dragRates {
+            guard let limit else { return minutes + cmLeft * rate }
+            let segmentCm = (limit - minutes) / rate
+            if cmLeft <= segmentCm { return minutes + cmLeft * rate }
+            minutes = limit
+            cmLeft -= segmentCm
+        }
+        return minutes
+    }
+
     /// 0 means the pull was too short to count as a duration (i.e. a click).
     static func dragMinutes(points: Double) -> Int {
-        let raw = points / pointsPerCm * minutesPerCm
+        let raw = rawMinutes(cm: points / pointsPerCm)
         if raw < Double(minMinutes) { return 0 }
         return max(minMinutes, roundMinutes(raw))
     }
