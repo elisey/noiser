@@ -26,8 +26,10 @@ notarization.
 ## Usage
 
 The menu bar shows the noiser mark — a ball on a thread: a ring when idle, a
-solid ball while playing, half-filled when paused. While a timer runs, the
-minutes left sit next to it (`24m`, `<1m` in the last minute).
+solid ball while playing, half-filled when paused — and next to it the minutes
+left (`24m`, `<1m` in the last minute, `>2h` and so on past 99 minutes),
+`∞` with no timer or `0m` when idle.
+The item keeps one width, so the panel under it never shifts.
 
 Click it to open the panel. The ball hangs on its thread under the time and a
 status pill:

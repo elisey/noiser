@@ -3,13 +3,40 @@ import Testing
 @testable import noiser
 
 struct MenuBarIconTests {
-    @Test func minutesLabel() {
-        #expect(MenuBarIcon.minutesLabel(remaining: nil) == nil)
-        #expect(MenuBarIcon.minutesLabel(remaining: 24 * 60 + 13) == "24m")
-        #expect(MenuBarIcon.minutesLabel(remaining: 60) == "1m")
-        #expect(MenuBarIcon.minutesLabel(remaining: 59) == "<1m")
-        #expect(MenuBarIcon.minutesLabel(remaining: 0) == "<1m")
-        #expect(MenuBarIcon.minutesLabel(remaining: 90 * 60) == "90m")
+    @Test func labelForEachState() {
+        #expect(MenuBarIcon.label(state: .idle, remaining: nil) == "0m")
+        #expect(MenuBarIcon.label(state: .playing, remaining: nil) == "∞")
+        #expect(MenuBarIcon.label(state: .paused, remaining: nil) == "∞")
+        #expect(MenuBarIcon.label(state: .playing, remaining: 24 * 60 + 13) == "24m")
+        #expect(MenuBarIcon.label(state: .paused, remaining: 24 * 60 + 13) == "24m")
+        #expect(MenuBarIcon.label(state: .playing, remaining: 60) == "1m")
+        #expect(MenuBarIcon.label(state: .playing, remaining: 59) == "<1m")
+        #expect(MenuBarIcon.label(state: .playing, remaining: 0) == "<1m")
+        #expect(MenuBarIcon.label(state: .playing, remaining: 99 * 60 + 59) == "99m")
+        #expect(MenuBarIcon.label(state: .playing, remaining: 100 * 60) == ">1h")
+        #expect(MenuBarIcon.label(state: .playing, remaining: 150 * 60) == ">2h")
+        #expect(MenuBarIcon.label(state: .paused, remaining: 9 * 3600 + 59) == ">9h")
+    }
+
+    @Test func statusImageKeepsItsWidth() {
+        Theme.registerFonts(url: URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("Support/Fonts/Archivo.ttf"))
+        let images = [
+            MenuBarIcon.image(for: .idle, label: "0m"),
+            MenuBarIcon.image(for: .playing, label: "∞"),
+            MenuBarIcon.image(for: .playing, label: "<1m"),
+            MenuBarIcon.image(for: .playing, label: "24m"),
+            MenuBarIcon.image(for: .paused, label: ">2h"),
+        ]
+        let size = MenuBarIcon.size
+        #expect(images.allSatisfy { $0.size == size && $0.isTemplate })
+        #expect(size.height == 18)
+        // Every label the status item can show fits in the reserved width.
+        for label in ["0m", "<1m", "24m", "99m", ">1h", ">9h"] {
+            let width = Theme.menubar.string(label, color: .black).size().width
+            #expect(MenuBarIcon.markSize.width + MenuBarIcon.gap + width <= size.width)
+        }
     }
 
     private func coverage(_ state: PlayState) -> [Bool] {
@@ -19,7 +46,7 @@ struct MenuBarIconTests {
         )!
         NSGraphicsContext.saveGraphicsState()
         NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
-        MenuBarIcon.image(for: state).draw(in: NSRect(x: 0, y: 0, width: 18, height: 18))
+        MenuBarIcon.markImage(for: state).draw(in: NSRect(x: 0, y: 0, width: 18, height: 18))
         NSGraphicsContext.restoreGraphicsState()
         return (0..<18).flatMap { y in (0..<18).map { x in rep.colorAt(x: x, y: y)!.alphaComponent > 0.5 } }
     }
@@ -27,9 +54,9 @@ struct MenuBarIconTests {
     /// Pixel at (x, y) counted from the top-left, like the SVG.
     private func filled(_ pixels: [Bool], _ x: Int, _ y: Int) -> Bool { pixels[y * 18 + x] }
 
-    @Test func imagesAreTemplates() {
+    @Test func marksAreTemplates() {
         for state in [PlayState.idle, .playing, .paused] {
-            let image = MenuBarIcon.image(for: state)
+            let image = MenuBarIcon.markImage(for: state)
             #expect(image.isTemplate)
             #expect(image.size == NSSize(width: 18, height: 18))
         }

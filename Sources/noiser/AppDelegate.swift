@@ -1,7 +1,7 @@
 import AppKit
 import AVFoundation
 
-final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate {
     static let popoverWidth = Theme.Metrics.popoverWidth
     static let popoverHeight = Theme.Metrics.popoverHeight
 
@@ -9,12 +9,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var engine: NoiseEngine!
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
-    private let anchor = PopoverAnchor()
     private var ballView: BallView!
     private var settingsWindow: SettingsWindow?
     private var tickTimer: Timer?
-    private var iconState: PlayState?
-    private var iconTitle: String?
+    private var iconContent: (state: PlayState, label: String)?
     private let speech = AVSpeechSynthesizer()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -64,11 +62,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         popover.contentViewController = controller
         popover.contentSize = NSSize(width: w, height: h)
         popover.behavior = .transient
-        popover.delegate = self
-    }
-
-    func popoverDidClose(_ notification: Notification) {
-        anchor.hide()
     }
 
     @objc private func togglePopover(_ sender: Any?) {
@@ -76,12 +69,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             popover.performClose(sender)
             return
         }
-        guard let button = statusItem.button, let buttonWindow = button.window else { return }
-        // Anchored to a still copy of the button's frame: the minutes next to the mark resize
-        // the status item, and a popover shown from the button itself would slide along.
-        let frame = buttonWindow.convertToScreen(button.convert(button.bounds, to: nil))
-        let view = anchor.place(at: frame)
-        popover.show(relativeTo: view.bounds, of: view, preferredEdge: .minY)
+        guard let button = statusItem.button else { return }
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         // An accessory app isn't frontmost, so make the popover key to receive the drag.
         NSApp.activate()
     }
@@ -115,21 +104,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
 
     private func refresh() {
-        setIcon(engine.state, title: MenuBarIcon.minutesLabel(remaining: engine.remaining()))
+        let state = engine.state
+        setIcon(state, label: MenuBarIcon.label(state: state, remaining: engine.remaining()))
         ballView.needsDisplay = true
     }
 
-    private func setIcon(_ state: PlayState, title: String?) {
-        guard let button = statusItem.button else { return }
-        if iconState != state {
-            iconState = state
-            button.image = MenuBarIcon.image(for: state)
-        }
-        if iconTitle != title {
-            iconTitle = title
-            button.attributedTitle = MenuBarIcon.title(title ?? "")
-            button.imagePosition = title == nil ? .imageOnly : .imageLeading
-        }
+    private func setIcon(_ state: PlayState, label: String) {
+        guard iconContent?.state != state || iconContent?.label != label else { return }
+        iconContent = (state, label)
+        statusItem.button?.image = MenuBarIcon.image(for: state, label: label)
     }
 
     @objc private func openSettings(_ sender: Any?) {
